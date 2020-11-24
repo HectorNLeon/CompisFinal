@@ -1,0 +1,5 @@
+Program UC1;
+
+main(){
+    write("Hello world");
+}

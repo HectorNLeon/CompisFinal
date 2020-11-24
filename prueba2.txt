@@ -1,0 +1,6 @@
+Program Fibonacci;
+var int : i, j, k, A[8], B[4][6];
+
+main(){
+    A[i+j*k] = j+ B[i*j][k-i] * A[k];
+}

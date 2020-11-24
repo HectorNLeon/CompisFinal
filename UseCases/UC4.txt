@@ -1,0 +1,19 @@
+Program UC4;
+var  int: x, i;
+    char: a;
+
+module void continuar(char c);
+{
+    if(c == 'Y') then{
+        write("Continua!");
+    }
+    else {
+        write("Adios!");
+    }
+}
+
+main(){
+    write("Quires proceder? Y/N");
+    read(a);
+    continuar(a);
+}

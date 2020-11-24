@@ -1,0 +1,19 @@
+Program TC3;
+var int : num;
+
+
+module void dibujar(int x);
+{
+    Size(720,480);
+    Pendown(300,200);
+    Circle(x, "red");
+    Penup();
+}
+
+main(){
+    num = 0;
+    write("Introduce el tamaño del circulo");
+    read(num);
+    dibujar(num);
+
+}

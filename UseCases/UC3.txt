@@ -1,0 +1,10 @@
+Program UC3;
+var  int: x, i;
+
+main(){
+    write("Ingresa un numero");
+    read(x);
+    from i=1 to x+1 do{
+        write("El cuadrado de ", i, " es ", i*i);
+    }
+}

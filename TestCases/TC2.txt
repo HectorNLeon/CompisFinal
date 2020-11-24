@@ -1,0 +1,25 @@
+Program TC2;
+var int : num, i;
+
+
+module int fib(int x);
+{
+   if((x==1)|(x==0)) then {
+      return(x);
+   }else {
+      return(fib(x-1)+fib(x-2));
+   }
+}
+
+main(){
+    num = 0;
+    while(num < 1) do{
+        write("Introduce un numero mayor a 0");
+        read(num);
+    }
+    write("Los~ ", num, " primeros numeros de la seria de Fibonacci son:");
+    from i=0 to num do{
+        write(fib(i));
+    }
+
+}

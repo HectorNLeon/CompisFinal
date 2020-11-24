@@ -1,0 +1,8 @@
+Program UC2;
+var  int: x;
+
+main(){
+    write("Ingresa un numero");
+    read(x);
+    write("El numero ingresado es ", x);
+}

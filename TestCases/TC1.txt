@@ -1,0 +1,19 @@
+Program TC1;
+var int : num, fib1, fib2, i;
+
+main(){
+    num = 0;
+    while(num < 2) do{
+        write("Introduce un numero mayor a 0");
+        read(num);
+    }
+    write("Los ", num, " primeros numeros de la seria de Fibonacci son:");
+    fib1 = 0;
+    fib2 = 1;
+    write(fib1);
+    from i=2 to num+1 do{
+        write(fib2);
+        fib2 = fib1 + fib2;
+        fib1 = fib2 - fib1;
+    }
+}
