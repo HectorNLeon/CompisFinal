@@ -1,0 +1,1 @@
+Se tiene completa toda la generacion de codigo, y toda la ejecucion en la maquina virtual excepto las funciones especiales de output grafico. 

@@ -17,7 +17,7 @@ main(){
         write("Introduce un numero mayor a 0");
         read(num);
     }
-    write("Los~ ", num, " primeros numeros de la seria de Fibonacci son:");
+    write("Los ", num, " primeros numeros de la seria de Fibonacci son:");
     from i=0 to num do{
         write(fib(i));
     }

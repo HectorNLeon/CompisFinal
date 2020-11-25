@@ -1,3 +1,6 @@
+# Hector Noel Leon Quiroz A01251806
+# Compilador MeMyself
+
 from scanner import tokens
 from CuboSemantico import CuboSemantico
 from TablaVariables import TablaVariables
@@ -7,11 +10,6 @@ from Cuadruplos import Cuadruplos
 from Direcciones import Direcciones
 import ply.yacc as yacc
 import sys
-
-# Notes:
-#   Change Factor in documentation
-#   And expresion?
-#   And VARCTE
 
 dictFunciones = TablaFunciones()
 globalVars = TablaVariables()
@@ -26,13 +24,14 @@ nombreFuncion = ""
 nombreVar = ""
 hasReturn = False
 hasFillColor = False
-versionControl = 0
+versionControl = []
 versionFinal = 0
 listaVariables = []
-pilaPOper = []
+pilaPoper = []
 pilaOp = []
 pilaTipo = []
 pilaSaltos = []
+pilaReturn = []
 pilaParams = []
 pilaLlamadas = []
 pilaDim = []
@@ -151,7 +150,7 @@ def p_ESTATUTO(p):
 
 def p_ASIGNACION(p):
     '''
-    ASIGNACION : ID pushPilaOp ARREGLOCALL EQUALS pushEqual EXPRESION popIgual SEMICOLON
+    ASIGNACION : ID pushPilaOp ARREGLOCALL EQUALS pushEqual EXPRESION popEqual SEMICOLON
     '''
 
 def p_LLAMDA(p):
@@ -313,6 +312,8 @@ def p_empty(p):
     '''
     empty :
     '''
+
+# Crea un nuevo cuádruplo "goto", agrega el nombre del programa al diccionario de variables globales.
 def p_addProgram(p):
     '''addProgram : '''
     global cuadruplos
@@ -320,11 +321,13 @@ def p_addProgram(p):
     cuadruplos.addCuadruplo("goto", -1, -1, -2)
     dictFunciones.agregarFuncion(nombreP, "void", 0, 0)
 
+# Borra todos los elementos de la lista "listaVariables".
 def p_emptyVars(p):
     ''' emptyVars : '''
     global listaVariables
     del listaVariables[:]
 
+# Agrega el id y tipo de una variable a la lista "listaVariables".
 def p_addVarLista(p):
     '''addVarLista : '''
     global listaVariables
@@ -333,6 +336,8 @@ def p_addVarLista(p):
     nombreVar = p[-1]
     listaVariables.append([nombreVar, tipoVar, False, 0, 0])
 
+# Guarda el id de la función en el diccionario de funciones y agrega una 
+# nueva variable con el id de la funciona al diccionario de variables globales.
 def p_addFunc(p):
     '''addFunc : '''
     global dictFunciones
@@ -353,12 +358,13 @@ def p_addFunc(p):
         print("Ya existe una variable global con el nombre ", nombreFuncion)
         sys.exit()
 
+# Agrega los parámetros guardados en la lista "listaVariables" al
+# diccionario de parámetros dentro del diccionario de la función.
 def p_addParamsFunc(p):
     '''addParamsFunc : '''
     global dictFunciones
     global nombreFuncion
     global listaVariables
-    #print(listaVariables)
     for variables in listaVariables:
         if variables[2]:
             print("Syntax Error: Un arreglo no puede ser un parametro", p.lineno(0))
@@ -371,8 +377,10 @@ def p_addParamsFunc(p):
     if resultado != "OK":
         print("Ya existe un parametro en la funcion", nombreFuncion,"con el nombre", resultado)
         sys.exit()
+    listaVariables = []
 
-
+# Agrega las variables guardadas en la lista "listaVariables" al
+# diccionario de variables locales dentro del diccionario de la función.
 def p_addVarsFunc(p):
     '''addVarsFunc : '''
     global dictFunciones
@@ -391,7 +399,7 @@ def p_addVarsFunc(p):
     if resultado != "OK":
         print("Ya existe una variable con el nombre", resultado)
         sys.exit()
-
+# Verifica return y agrega el cuádruplo Endfunc y resetea las direcciones locales y temporales
 def p_endFunc(p):
     '''endFunc : '''
     global tipoFuncion
@@ -400,12 +408,15 @@ def p_endFunc(p):
     global dictFunciones
     global nombreFuncion
     global Direccion
-
+    global pilaReturn
     if tipoFuncion != "void" and hasReturn == False:
         print("Syntax error: La funcion", nombreFuncion, "ocupa return", p.lineno(0))
         sys.exit()
+    elif tipoFuncion != "void" and hasReturn:
+        while len(pilaReturn):
+            fill = pilaReturn.pop()
+            cuadruplos.addTo(fill,cuadruplos.getCount())
 
-    hasReturn = False
     if nombreFuncion != "main":
         cuadruplos.addCuadruplo("Endfunc", -1, -1, -1)
     
@@ -415,7 +426,10 @@ def p_endFunc(p):
     Direccion["localint"].resetActual()
     Direccion["localfloat"].resetActual()
     Direccion["localchar"].resetActual()
+    hasReturn = False
 
+# Asigna direcciones a todas las variables en "listaVariables" y las
+# agrega al diccionario de variables globales.
 def p_addGlobalVars(p):
     '''addGlobalVars : '''
     global dictFunciones
@@ -432,21 +446,24 @@ def p_addGlobalVars(p):
         else:
             print("Ya existe una variable con el nombre", variable[0])
             sys.exit()
+    listaVariables = []
 
+# Si el tope de pilaPoper es una condición  y los tipos son compatibles
+# para los dos siguientes valores de pilaOp se crea el cuádruplo.
 def p_popCondition(p):
     '''popCondition : '''
-    global pilaPOper
+    global pilaPoper
     global pilaOp
     global pilaTipo
     global cuadruplos
     global cuboSem
     global Direccion
-    if len(pilaPOper) > 0:
-        topPoper = pilaPOper[-1]
+    if len(pilaPoper) > 0:
+        topPoper = pilaPoper[-1]
     else: topPoper = "None"
     if topPoper != '(':
-        if  topPoper == '<'  or topPoper == '>' or topPoper == '==' or topPoper == '<>' or topPoper == '|' or topPoper == '&':
-            op = pilaPOper.pop()
+        if  topPoper == '<'  or topPoper == '>' or topPoper == '==' or topPoper == '!=' or topPoper == '|' or topPoper == '&':
+            op = pilaPoper.pop()
             opDerecho = pilaOp.pop()
             opIzquierdo = pilaOp.pop()
             tipoDerecho = pilaTipo.pop()
@@ -463,19 +480,21 @@ def p_popCondition(p):
             pilaOp.append(nuevaDir)
             pilaTipo.append(tipoRes)
 
-def p_popIgual(p):
-    '''popIgual : '''
-    global pilaPOper
+# Si el tope de pilaPoper es '=' y los tipos son compatibles para los dos
+# siguientes valores de pilaOp se crea el cuadruplo "=".
+def p_popEqual(p):
+    '''popEqual : '''
+    global pilaPoper
     global pilaOp
     global pilaTipo
     global cuadruplos
     global cuboSem
-    if len(pilaPOper) > 0:
-        topPoper = pilaPOper[-1]
+    if len(pilaPoper) > 0:
+        topPoper = pilaPoper[-1]
     else: topPoper = "None"
     if topPoper != '(':
         if  topPoper == '=':
-            op = pilaPOper.pop()
+            op = pilaPoper.pop()
             opDerecho = pilaOp.pop()
             opIzquierdo = pilaOp.pop()
             tipoDerecho = pilaTipo.pop()
@@ -492,21 +511,22 @@ def p_popIgual(p):
                 sys.exit()
             cuadruplos.addCuadruplo(op, opDerecho, -1, opIzquierdo)
 
-
+# Si el tope de pilaPoper es '*' o '/'  y los tipos son compatibles
+# para los dos siguientes valores de pilaOp se crea el cuádruplo.
 def p_popMultDiv(p):
     '''popMultDiv : '''
-    global pilaPOper
+    global pilaPoper
     global pilaOp
     global pilaTipo
     global cuadruplos
     global cuboSem
 
-    if len(pilaPOper) > 0:
-        topPoper = pilaPOper[-1]
+    if len(pilaPoper) > 0:
+        topPoper = pilaPoper[-1]
     else: topPoper = "None"
     if topPoper != '(':
         if  topPoper == '*' or topPoper == '/':
-            op = pilaPOper.pop()
+            op = pilaPoper.pop()
             opDerecho = pilaOp.pop()
             opIzquierdo = pilaOp.pop()
             tipoDerecho = pilaTipo.pop()
@@ -523,20 +543,22 @@ def p_popMultDiv(p):
             pilaOp.append(nuevaDir)
             pilaTipo.append(tipoRes)
 
+# Si el tope de pilaPoper es '+' o '-' y los tipos son compatibles
+# para los dos siguientes valores de pilaOp se crea el cuádruplo.
 def p_popPlusMinus(p):
     '''popPlusMinus : '''
-    global pilaPOper
+    global pilaPoper
     global pilaOp
     global pilaTipo
     global cuadruplos
     global cuboSem
 
-    if len(pilaPOper) > 0:
-        topOper = pilaPOper[-1]
+    if len(pilaPoper) > 0:
+        topOper = pilaPoper[-1]
     else: topOper = "None"
     if topOper != '(':
         if  topOper == '+' or topOper == '-':
-            op = pilaPOper.pop()
+            op = pilaPoper.pop()
             opDerecho = pilaOp.pop()
             opIzquierdo = pilaOp.pop()
             tipoDerecho = pilaTipo.pop()
@@ -553,26 +575,32 @@ def p_popPlusMinus(p):
             pilaOp.append(nuevaDir)
             pilaTipo.append(tipoRes)
 
+#Agrega '=' a pilaPoper
 def p_pushEqual(p):
     ''' pushEqual : '''
-    global pilaPOper
-    pilaPOper.append(p[-1])
+    global pilaPoper
+    pilaPoper.append(p[-1])
 
+# Agrega '*' o '/' a pilaPoper
 def p_pushMultDiv(p):
     ''' pushMultDiv : '''
-    global pilaPOper
-    pilaPOper.append(p[-1])
+    global pilaPoper
+    pilaPoper.append(p[-1])
 
+# Agrega '+' o '-' a pilaPoper
 def p_pushPlusMinus(p):
     ''' pushPlusMinus : '''
-    global pilaPOper
-    pilaPOper.append(p[-1])
+    global pilaPoper
+    pilaPoper.append(p[-1])
 
+# Agrega una condicion a pilaPoper
 def p_pushCondition(p):
     ''' pushCondition : '''
-    global pilaPOper
-    pilaPOper.append(p[-1])
+    global pilaPoper
+    pilaPoper.append(p[-1])
 
+# Se agrega la constante a la tabla de constantes si es que no existe,
+# luego se guarda el valor y el tipo en pilaOp y pilaTipo.
 def p_pushConstInt(p):
     '''pushConstInt : '''
     global pilaOp
@@ -589,6 +617,8 @@ def p_pushConstInt(p):
         pilaOp.append(constante["dir"])
         pilaTipo.append("int")
 
+# Se agrega la constante a la tabla de constantes si es que no existe,
+# luego se guarda el valor y el tipo en pilaOp y pilaTipo.
 def p_pushConstFloat(p):
     '''pushConstFloat : '''
     global pilaOp
@@ -605,6 +635,8 @@ def p_pushConstFloat(p):
         pilaOp.append(constante["dir"])
         pilaTipo.append("float")
 
+# Se agrega la constante a la tabla de constantes si es que no existe,
+# luego se guarda el valor y el tipo en pilaOp y pilaTipo.
 def p_pushConstChar(p):
     '''pushConstChar : '''
     global pilaOp
@@ -621,6 +653,8 @@ def p_pushConstChar(p):
         pilaOp.append(constante["dir"])
         pilaTipo.append("char")
 
+# Se agrega la constante a la tabla de constantes si es que no existe,
+# luego se guarda el valor y el tipo en pilaOp y pilaTipo.
 def p_pushConstString(p):
     '''pushConstString : '''
     global pilaOp
@@ -636,7 +670,8 @@ def p_pushConstString(p):
     else:
         pilaOp.append(constante["dir"])
         pilaTipo.append("string")
-
+        
+# Agrega la id a pilaOp y el tipo a pilaTipo.
 def p_pushPilaOp(p):
     '''  pushPilaOp : '''
     global dictFunciones
@@ -667,20 +702,23 @@ def p_pushPilaOp(p):
         print("La variable", varName, "no ha sido declarada en linea", p.lineno(0))
         sys.exit()
 
+# Agrega '(' a pilaPoper
 def p_pushParen(p):
     '''pushParen : '''
-    global pilaPOper
-    pilaPOper.append('(')
+    global pilaPoper
+    pilaPoper.append('(')
 
+# Saca '(' de pilaPoper si es el elemento en el tope.
 def p_popParen(p):
     '''popParen : '''
-    global pilaPOper
-    if len(pilaPOper) > 0:
-        topPoper = pilaPOper[-1]
+    global pilaPoper
+    if len(pilaPoper) > 0:
+        topPoper = pilaPoper[-1]
     else: topPoper = "None"
     if topPoper == '(':
-        pilaPOper.pop()
+        pilaPoper.pop()
 
+# Se guarda el parámetro y su tipo en pilaParams
 def p_addParam(p):
     ''' addParam : '''
     global pilaParams
@@ -690,6 +728,8 @@ def p_addParam(p):
     tipoParam = pilaTipo.pop()
     pilaParams.append([param, tipoParam])
 
+# Verifica que los parámetros en pilaParams sean la cantidad y el tipo
+# correcto, y luego crea un cuádruplo "parameter" para cada uno.
 def p_verifyParams(p):
     ''' verifyParams : '''
     global dictFunciones
@@ -714,6 +754,8 @@ def p_verifyParams(p):
         i += 1
     pilaParams = []
 
+# Crea el cuádruplo 'gosub' con el nombre de la función y crea el
+# cuádruplo '=' para la variable global de la función.
 def p_pushGosub(p):
     '''pushGosub : '''
     global dictFunciones
@@ -736,7 +778,9 @@ def p_pushGosub(p):
         cuadruplos.addCuadruplo("=", variableFuncion["dir"], -1, nuevaDir)
         pilaOp.append(nuevaDir)
         pilaTipo.append(returnType)
+    pilaLlamadas.pop()
 
+# Crea el cuádruplo "gosub" con el nombre de la función
 def p_pushGosubLlamada(p):
     '''pushGosubLlamada : '''
     global dictFunciones
@@ -747,8 +791,10 @@ def p_pushGosubLlamada(p):
     global pilaTipo
 
     nombreFuncion = pilaLlamadas[-1]
+    pilaLlamadas.pop()
     cuadruplos.addCuadruplo("gosub", nombreFuncion, -1, -1)
 
+# Agrega el id a pilaLlamadas y crea el cuádruplo, "era" con el nombre de la función.
 def p_pushEra(p):
     ''' pushEra : '''
     global cuadruplos
@@ -757,6 +803,7 @@ def p_pushEra(p):
     pilaLlamadas.append(nombreFuncion)
     cuadruplos.addCuadruplo("era", nombreFuncion, -1, -1)
 
+# Se saca la id y el tipo de pilaOp y pilaTipo y se crea el cuadruplo "write"
 def p_popWrite(p):
     '''popWrite : '''
     global cuadruplos
@@ -765,11 +812,13 @@ def p_popWrite(p):
     pilaTipo.pop()
     cuadruplos.addCuadruplo("write", -1, -1, op)
 
+# Se crea el cuadruplo "writeEnd"
 def p_addWriteEnd(p):
     '''addWriteEnd : '''
     global cuadruplos
     cuadruplos.addCuadruplo("writeEnd", -1, -1, -1)
 
+# Se saca la id y el tipo de pilaOp y pilaTipo y se crea el cuadruplo "read".
 def p_popRead(p):
     '''popRead : '''
     global cuadruplos
@@ -778,11 +827,13 @@ def p_popRead(p):
     pilaTipo.pop()
     cuadruplos.addCuadruplo("read", -1, -1, op)
 
+# La variable hasColor = true
 def p_hasColor(p):
     '''hasColor :'''
     global hasFillColor
     hasFillColor = True
 
+# Se saca las id y los tipos de pilaOp y pilaTipo, se crea el cuadruplo "line".
 def p_popLine(p):
     '''popLine : '''
     global cuadruplos
@@ -796,6 +847,7 @@ def p_popLine(p):
         sys.exit()
     cuadruplos.addCuadruplo("line", op2, op1, -1)
 
+# Se saca las id y los tipos de pilaOp y pilaTipo, el color y se crea el cuadruplo "point".
 def p_popPoint(p):
     '''popPoint : '''
     global cuadruplos
@@ -813,6 +865,7 @@ def p_popPoint(p):
         sys.exit()
     cuadruplos.addCuadruplo("point", op, color, -1)
 
+# Se saca las id y los tipos de pilaOp y pilaTipo, el color y se crea el cuadruplo "circle".
 def p_popCircle(p):
     '''popCircle : '''
     global cuadruplos
@@ -830,6 +883,7 @@ def p_popCircle(p):
         sys.exit()
     cuadruplos.addCuadruplo("circle", op, color, -1)
 
+# Se saca las id y los tipos de pilaOp y pilaTipo, el color y se crea el cuadruplo "arc".
 def p_popArc(p):
     '''popArc : '''
     global cuadruplos
@@ -849,11 +903,13 @@ def p_popArc(p):
         sys.exit()
     cuadruplos.addCuadruplo("arc", op2, op1, color)
 
+# Se crea el cuadruplo "penup".
 def p_popPenup(p):
     '''popPenup : '''
     global cuadruplos
     cuadruplos.addCuadruplo("penup", -1, -1, -1)
 
+# Se saca las id y los tipos de pilaOp y pilaTipo y se crea el cuadruplo "arc".
 def p_popPendown(p):
     '''popPendown : '''
     global cuadruplos
@@ -867,6 +923,7 @@ def p_popPendown(p):
         sys.exit()
     cuadruplos.addCuadruplo("pendown", op2, op1, -1)
 
+# Se saca la id y el tipo de pilaOp y pilaTipo y se crea el cuadruplo "color".
 def p_popColor(p):
     '''popColor : '''
     global cuadruplos
@@ -875,7 +932,7 @@ def p_popColor(p):
     pilaTipo.pop()
     cuadruplos.addCuadruplo("color", -1, -1, op)
 
-
+# Se saca las id y los tipos de pilaOp y pilaTipo y se crea el cuadruplo "size".
 def p_popSize(p):
     '''popSize : '''
     global cuadruplos
@@ -889,11 +946,14 @@ def p_popSize(p):
         sys.exit()
     cuadruplos.addCuadruplo("size", op2, op1, -1)
 
+# Se crea el cuadruplo "clear".
 def p_popClear(p):
     '''popClear : '''
     global cuadruplos
     cuadruplos.addCuadruplo("clear", -1, -1, -1)
 
+# Verifica el tipo de retorno de la funcion, crea el cuadruplo "return",
+# crea el cuadruplo "goto" y agrega el numero  de cuadruplo a la pilaReturn
 def p_popReturn(p):
     '''popReturn : '''
     global pilaOp
@@ -903,6 +963,7 @@ def p_popReturn(p):
     global tipoFuncion
     global dictFunciones
     global nombreFuncion
+    global pilaReturn
     elem = pilaOp.pop()
     elemTipo = pilaTipo.pop()
     hasReturn = True
@@ -910,7 +971,11 @@ def p_popReturn(p):
         print("Type mismatch: El elemento que se regresa es diferente al tipo de funcion declarada", p.lineno(0))
         sys.exit()
     cuadruplos.addCuadruplo("return", -1, -1, elem)
+    cuadruplos.addCuadruplo("goto", -1, -1, -2)
+    pilaReturn.append(cuadruplos.getCount()-1)
 
+# Verifica que el tipo del tope sea bool, crea el cuádruplo "gotof" y agrega
+# el número del cuádruplo a pilaSaltos.
 def p_pushGotoF(p):
     '''pushGotoF :'''
     global pilaSaltos
@@ -926,6 +991,10 @@ def p_pushGotoF(p):
         print("Type mismatch: Se espera un bool como condicion", p.lineno(0))
         sys.exit()
 
+# Crea el cuádruplo "goto", saca el elemento de la pilaSaltos y rellena
+# el cuadruplo "gotof" que apunta con el siguiente número del
+# cuádruplo, por último agrega el número de cuádruplo actual a la
+# pilaSaltos.
 def p_rellenarFalso(p):
     '''rellenarFalso :'''
     global pilaSaltos
@@ -936,6 +1005,8 @@ def p_rellenarFalso(p):
     pilaSaltos.append(cuadruplos.getCount()-1)
     cuadruplos.addTo(falso, cuadruplos.getCount())
 
+# Saca el elemento de la pilaSaltos y rellena el cuádruplo "goto" que
+# apunta con el siguiente número del cuádruplo. 
 def p_rellenaSalida(p):
     '''rellenarSalida :'''
     global pilaSaltos
@@ -944,6 +1015,7 @@ def p_rellenaSalida(p):
     salida = pilaSaltos.pop()
     cuadruplos.addTo(salida, cuadruplos.getCount())
 
+# Agrega el número de cuadruplo actual a pilaSaltos
 def p_pushSalto(p):
     '''pushSalto :'''
     global pilaSaltos
@@ -951,6 +1023,8 @@ def p_pushSalto(p):
 
     pilaSaltos.append(cuadruplos.getCount())
 
+# Crea el cuádruplo "goto" con el número agregado en pushSalto  y
+# rellena el "gotof" de pushGoToF
 def p_rellenarWhile(p):
     '''rellenarWhile :'''
     global pilaSaltos
@@ -961,6 +1035,7 @@ def p_rellenarWhile(p):
     cuadruplos.addCuadruplo("goto", -1, -1, start)
     cuadruplos.addTo(falso, cuadruplos.getCount())
 
+# Verifica la variable y agrega la id a pilaOp y el tipo a pilaTipo.
 def p_pushFromId(p):
     '''pushFromId :'''
     global dictFunciones
@@ -991,6 +1066,7 @@ def p_pushFromId(p):
         print("La variable", varName, "no ha sido declarada en linea", p.lineno(0))
         sys.exit()
 
+# Verifica el tipo de la constante con la variable y agrega un cuádruplo "=".
 def p_pushVC(p):
     '''pushVC :'''
     global pilaSaltos
@@ -1008,10 +1084,13 @@ def p_pushVC(p):
     if tipoRes == "error":
         print("Type mismatch en la declaracion del from", p.lineno(0))
         sys.exit()
-    versionControl = vcontrol
+    versionControl.append(vcontrol)
     cuadruplos.addCuadruplo("=", exp, -1, vcontrol)
     cuadruplos.addCuadruplo("=", vcontrol, -1, "VC")
 
+# Agrega el cuádruplo "<" para comparar  VC con VF y agrega el número del
+# cuádruplo a pilaSaltos, luego agrega el cuádruplo "gotof"  y agrega el
+# número del cuádruplo a pilaSaltos.
 def p_pushVF(p):
     '''pushVF :'''
     global pilaSaltos
@@ -1032,11 +1111,13 @@ def p_pushVF(p):
     if nuevaDir == -1:
         print("Stack overflow: Sobrepasaste el espacio de memoria para las variables")
         sys.exit()
-    cuadruplos.addCuadruplo("<", versionControl, versionFinal, nuevaDir)
+    cuadruplos.addCuadruplo("<", versionControl[-1], versionFinal, nuevaDir)
     pilaSaltos.append(cuadruplos.getCount()-1)
     cuadruplos.addCuadruplo("gotof", nuevaDir, -1, -2)
     pilaSaltos.append(cuadruplos.getCount()-1)
 
+# Agrega el cuádruplo "+" para sumar VC más 1, rellena el "gotof" de
+# pushVF y crea el cuádruplo "goto" con el número agregado en pushVF.
 def p_rellenaFrom(p):
     '''rellenaFrom :'''
     global pilaSaltos
@@ -1047,7 +1128,7 @@ def p_rellenaFrom(p):
     constante = constantes.buscarVariable(1)
     if constante == "ERROR":
         dirConstant = Direccion["constint"].getDir()
-        constantes.agregarVariable("1", "int", dirConstant)
+        constantes.agregarVariable(1, "int", dirConstant, False, 0, 0)
     else:
         dirConstant = constante["dir"]
 
@@ -1055,18 +1136,21 @@ def p_rellenaFrom(p):
     if nuevaDir == -1:
         print("Stack overflow: Sobrepasaste el espacio de memoria para las variables")
         sys.exit()
-    cuadruplos.addCuadruplo("+", versionControl, dirConstant , nuevaDir)
-    cuadruplos.addCuadruplo("=", nuevaDir, -1 , versionControl)
+    cuadruplos.addCuadruplo("+", versionControl[-1], dirConstant , nuevaDir)
+    cuadruplos.addCuadruplo("=", nuevaDir, -1 , versionControl[-1])
+    versionControl.pop()
     fin = pilaSaltos.pop()
     start = pilaSaltos.pop()
     cuadruplos.addCuadruplo("goto", -1, -1, start)
     cuadruplos.addTo(fin, cuadruplos.getCount())
 
+# Agrega el número de cuádruplo al "goto" que se agregó en addProgram.
 def p_rellenaMain(p):
     '''rellenaMain : '''
     global cuadruplos
     cuadruplos.addTo(0, cuadruplos.getCount())
 
+# Saca el valor de la dimension de pilaOp y lo agrega a pilaDim
 def p_pushDim(p):
     '''pushDim :'''
     global pilaDim
@@ -1076,6 +1160,7 @@ def p_pushDim(p):
     dimension = constantes.buscarVariableDirName(dim)
     pilaDim.append(dimension)
 
+# Declara la variable como arreglo en el diccionario de variables y agrega las dimensiones de pilaDim
 def p_addArreglo(p):
     '''addArreglo :'''
     global pilaDim
@@ -1088,6 +1173,8 @@ def p_addArreglo(p):
         i+=1
     pilaDim = []
 
+# Agrega el cuadruplo "ver" que verifica que el índice deseado este entre las
+# dimensiones del arreglo.
 def p_verifyDim(p):
     '''verifyDim :'''
     global pilaDim
@@ -1115,7 +1202,7 @@ def p_verifyDim(p):
 
     cuadruplos.addCuadruplo("ver", op, dirConstant, dirConstant2)
 
-
+# Agrega los cuádruplos necesarios para calcular la dirección del índice que se pide.
 def p_calculateDir(p):
     '''calculateDir :'''
     global pilaOp
@@ -1180,6 +1267,7 @@ def p_calculateDir(p):
         dimCounter = 0
         pilaDim = []
 
+# Exporta las funciones, constantes y cuadruplos
 def p_printTables(p):
     '''printTables : '''
     #constantes.printVars()

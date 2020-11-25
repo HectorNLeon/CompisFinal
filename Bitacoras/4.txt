@@ -1,0 +1,1 @@
+Se tiene la generacion de cuadruplos con direcciones de memoria para expresiones y funciones, falta ciclos y arreglar errores y bugs.

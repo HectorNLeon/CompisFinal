@@ -1,0 +1,55 @@
+Program TC6;
+
+module void multiplyMat();
+var int : m, n, p, q, c, d, k, sum, input ;
+    int : first[10][10], second[10][10], multiply[10][10];
+{
+    sum = 0;
+    write("Ingresa el numero de columnas y renglones de la primera matriz (max 10)");
+    read(m);
+    read(n);
+    write("Ingresa los elementos de la primer matriz");
+    from c = 0 to m do{
+        from d = 0 to n do{
+            read(input);
+            first[c][d] = input;
+        }
+    }
+    write("Ingresa el numero de columnas y renglones de la segunda matriz (max 10)");
+    read(p);
+    read(q);
+    if (n != p) then{
+        write("La multiplicacion no es posible");
+    }
+    else{
+        write("Ingresa los elementos de la segunda matriz");
+        from c = 0 to p do{
+            from d = 0  to q do{
+                read(input);
+                second[c][d] = input;
+            }
+        }
+
+        from c = 0 to m do{
+            from d = 0  to q do{
+                from k = 0 to p do{
+                    sum = sum + first[c][k]*second[k][d];
+                }
+                multiply[c][d] = sum;
+                sum = 0;
+            }
+        }
+ 
+        write("Producto de las matrices: ");
+
+        from c = 0 to m do{
+            from d = 0  to q do{
+                write(multiply[c][d]);
+            }
+        }
+    }
+}
+
+main(){
+    multiplyMat();
+}

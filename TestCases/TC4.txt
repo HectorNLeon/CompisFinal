@@ -1,0 +1,19 @@
+Program TC4;
+var int: num;
+
+module int fact (int j);
+{
+    if(j == 1) then 
+        {   
+            return (j);}
+    else
+        {
+            return (j * fact(j-1));
+        }
+}
+
+main(){
+    write("Ingresa el factorial a calcular");
+    read(num);
+    write(fact(num));
+}

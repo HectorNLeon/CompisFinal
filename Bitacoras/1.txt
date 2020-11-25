@@ -1,0 +1,4 @@
+Se tiene el analisis de Lexico y Sintaxis completo (parser y el scanner) en ply.
+Tuve unos problemas de shift/reduce conflicts con las variables y funciones, el parser no podia
+detectar cuando termina la declaracion de variables y por ende tuve que cambiar el orden
+de module y tipo al momento de declarar una funcion.

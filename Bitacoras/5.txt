@@ -1,0 +1,1 @@
+Se tiene completo el avance desde la generacion de todos los cuadruplos con las direcciones de memoria y la ejecucion de operaciones aritemticas en la Maquina Virtual.

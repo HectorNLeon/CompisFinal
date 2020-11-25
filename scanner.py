@@ -79,7 +79,7 @@ t_OR = r'\|'
 t_GREATER_THAN = r'\>'
 t_LESS_THAN = r'\<'
 t_IS_EQUAL = r'\=\='
-t_NOT_EQUAL = r'\<\>'
+t_NOT_EQUAL = r'\!\='
 
 def t_ID(t):
     r'[a-zA-Z][a-zA-Z_0-9]*'

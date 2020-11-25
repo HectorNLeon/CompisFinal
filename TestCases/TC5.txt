@@ -1,0 +1,30 @@
+Program TC5;
+var int : num, result, i, Array[20];
+
+
+module int find(int x);
+{
+    from i=0 to 20 do{
+        if(Array[i] == x) then{
+            return(i);
+        }
+    }
+    return(100);
+}
+
+main(){
+    num = 0;
+    from i=0 to 20 do{
+        Array[30] = i*2+1;
+    }
+    write("Que numero quieres buscar?");
+    read(num);
+    result = find(num);
+    if(result < 100) then{
+        write("El numero ",Array[result], " se encuentra en el indice ", result);
+    }
+    else{
+        write("El numero ",num," no se encuentra en el arreglo");
+    }
+
+}

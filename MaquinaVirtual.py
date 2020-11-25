@@ -1,3 +1,6 @@
+# Hector Noel Leon Quiroz A01251806
+# Maquina Virtual MeMyself
+
 from Memoria import Memoria
 import sys
 import tkinter
@@ -15,6 +18,7 @@ y0 = 0
 actualHeight = 600
 actualWidth = 800
 
+# Lee las funciones, cuadruplos y constantes
 def readFile(data):
     read = ""
     for i in data:
@@ -39,6 +43,7 @@ def readFile(data):
             cuadruplo = i.split(";")
             readCuad(cuadruplo)
 
+# Parsea las funcniones
 def readFunc(funcion):
     global funciones
     nombre = funcion[0]
@@ -61,7 +66,8 @@ def readFunc(funcion):
             if paramStart != 0 and paramStart != c:
                 params.append(int(resto[paramStart: c]))
     funciones[nombre] = {"cuad" : cuadruplo, "params": params, "dir": dirGlobal}
-        
+
+# Parsea las constanes
 def readConstantes(constante):
     global memoriaConstante
     address = int(constante[1])
@@ -75,7 +81,7 @@ def readConstantes(constante):
     else:
         memoriaConstante.assign(address, constante[0])
 
-
+# Parsea las cuadruplos
 def readCuad(cuadruplo):
     global cuadruplos
     for i in range (0, len(cuadruplo)):
@@ -83,7 +89,7 @@ def readCuad(cuadruplo):
             cuadruplo[i] = int(cuadruplo[i])
     cuadruplos.append(cuadruplo)
 
-
+# Corre los cuadruplos
 def runContext():
     global pilaMemoriaLocal
     global pilaMemoriaTemp
@@ -123,11 +129,11 @@ def runContext():
                 print("ERROR: El indice en el arreglo esta fuera de las dimensiones declaradas")
                 sys.exit()
         elif cuadruplo[0] == "era":
-            llamadaFuncion.append(cuadruplo[1])
+            llamadaFuncion.append([cuadruplo[1]])
         elif cuadruplo[0] == "parameter":
-            llamadaFuncion.append(getValor(cuadruplo[1]))
+            llamadaFuncion[-1].append(getValor(cuadruplo[1]))
         elif cuadruplo[0] == "gosub":
-            nombre = llamadaFuncion[0]
+            nombre = llamadaFuncion[-1][0]
             lastIp.append(ip)
             ip = funciones[nombre]["cuad"]
             dirGlobal = funciones[nombre]["dir"]
@@ -135,9 +141,9 @@ def runContext():
             pilaMemoriaTemp.append(Memoria())
             index = 1
             for param in funciones[nombre]["params"]:
-                assignValor(llamadaFuncion[1], param)
+                assignValor(llamadaFuncion[-1][1], param)
                 index += 1
-            llamadaFuncion = []
+            llamadaFuncion.pop()
         elif cuadruplo[0] == "return":
             returnVal = getValor(cuadruplo[3])
             assignValor(returnVal, dirGlobal)
@@ -249,7 +255,7 @@ def runContext():
         elif cuadruplo[0] == ">":
             resultado = (getValor(cuadruplo[1]) > getValor(cuadruplo[2]))
             assignValor(resultado, cuadruplo[3])
-        elif cuadruplo[0] == "<>":
+        elif cuadruplo[0] == "!=":
             resultado = (getValor(cuadruplo[1]) != getValor(cuadruplo[2]))
             assignValor(resultado, cuadruplo[3])
         elif cuadruplo[0] == "&":
@@ -268,6 +274,7 @@ def runContext():
     pilaMemoriaLocal.pop()
     pilaMemoriaTemp.pop()
 
+# Regresa el valor de la direccion solicitada
 def getValor(direccion):
     global pilaMemoriaLocal
     global pilaMemoriaTemp
@@ -287,6 +294,7 @@ def getValor(direccion):
     elif direccion > 31999 and direccion < 44000:
         return memoriaConstante.get(direccion)
 
+# Le asigna el valor enviado a la direccion solicitada
 def assignValor(valor, direccion):
     global pilaMemoriaLocal
     global pilaMemoriaTemp
@@ -306,6 +314,7 @@ def assignValor(valor, direccion):
     elif direccion > 31999 and direccion < 44000:
         memoriaConstante.assign(direccion, valor)
 
+# Lee un input del usuario y lo regresa segun su tipo
 def readValor(direccion):
     resultado = input()
     if (direccion > 1999 and direccion <  5000) or (direccion > 10999 and direccion <  14000):
