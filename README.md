@@ -6,7 +6,7 @@ MeMyself es un lenguaje de programacion orientado a jóvenes que buscan aprender
 Para poder correr el lenguajes es necesario contar con lo siguiente
 
 * Python con las librerias ply y tkinter (tkinter ya viene instalado con las versiones mas recientes de python)
-* Todos los archivos en este repo
+* Todos los archivos en este repo <br/>
 Si se tiene dudas con la ejecucion se puede ver el siguiente video<br/>
 https://drive.google.com/file/d/1wVqPWSu562UCBdzNhLaRbMVBsFPWWD_-/view?usp=sharing
 
