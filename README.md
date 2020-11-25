@@ -5,8 +5,10 @@ MeMyself es un lenguaje de programacion orientado a jóvenes que buscan aprender
 # Antes de empezar
 Para poder correr el lenguajes es necesario contar con lo siguiente
 
-* Python con las librerias ply y tkinter
+* Python con las librerias ply y tkinter (tkinter ya viene instalado con las versiones mas recientes de python)
 * Todos los archivos en este repo
+Si se tiene dudas con la ejecucion se puede ver el siguiente video<br/>
+https://drive.google.com/file/d/1wVqPWSu562UCBdzNhLaRbMVBsFPWWD_-/view?usp=sharing
 
 # General 
 La estructura que sigue MeMyself es la siguiente:
@@ -124,7 +126,7 @@ write("Hola ", x, " ", suma(1+2));
 Read permite al usuario ingresar por medio de la terminal un valor para una variable.       El valor ocupa ser el mismo que el de la variable.
 Read no funciona para arreglos. Se ocupar iniciar una variable leerla y luego asignarla.
 ```
-read(x)
+read(x);
 ```
 ## Condicionales
 If y else son los condicionales permitidos por el lenguaje. La expresion ocupa ser bool.
