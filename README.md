@@ -1,9 +1,8 @@
 # MeMyself
 MeMyself es un lenguaje de programacion orientado a jóvenes que buscan aprender los fundamentos de la programación gráfica. Este lenguaje es capaz de manejar Estatutos, Expresiones aritmeticas, Modulos, Arreglos, Variables y Output Grafico.
 
-
 # Antes de empezar
-Para poder correr el lenguajes es necesario contar con lo siguiente
+Para poder correr el lenguaje es necesario contar con lo siguiente
 
 * Python con las librerias ply y tkinter (tkinter ya viene instalado con las versiones mas recientes de python)
 * Todos los archivos en este repo <br/>
@@ -30,7 +29,7 @@ main(){
 }
 ```
 
-## Ejemplo de ejecucion
+## Ejemplo de ejecución
 Crea un archivo de txt y teclea algo parecido 
 ```
 Program UC1;
@@ -41,7 +40,7 @@ main(){
 ```
 Para correr el archivo corre el siguiente comando en la terminal
 ```
-py MeMyself.py <Nombre o direccion de tu archivo>
+py MeMyself.py <Nombre o dirección de tu archivo>
 ```
 
 ## Declaración de variables
@@ -63,7 +62,7 @@ var int: Arreglo[20];
 ```
 Los indices del arreglo empiezan del 0 al tamaño declarado menos 1 (19)
 
-## Declaración de Modulos (Funciones)
+## Declaración de módulos (Funciones)
 
 Se pueden declarar modulos de tipo int, float, char o void. Si el tipo del modulo es int, float o void es obligatorio tener un return al final del modulo. Si es void no se ocupa.
 ```
@@ -98,29 +97,27 @@ main(){
 Cualquier modulo que ha sido declarada previamente se puede llamar. Si el modulo tiene un return se puede asignar un modulo a una variable. Al momento de llamar al modulo es necesario que contenga el mismo numero de parametros y el mismo tipo del parametro.
 
 ```
-Program LLamadas;
+Program Llamadas;
 var int : resultado;
 
 module void ejemplo(){
-	write("Hola");
+    write("Hola");
 }
 
 module int suma(int x, int y){
-	return(x+y);
+    return(x+y);
 }
 main(){
-	ejemplo();
+    ejemplo();
     resultado = suma(1+2);
 }
 ```
-
 
 ## Write
 Write te permite imprimir cualquier string o variable en la terminal. Si es un string es necesario que este entre "". Se puede tener uno o mas parametros al momento de llamar a write.
 ```
 write("Hola ", x, " ", suma(1+2));
 ```
-
 
 ## Read
 Read permite al usuario ingresar por medio de la terminal un valor para una variable.       El valor ocupa ser el mismo que el de la variable.
@@ -143,11 +140,11 @@ else
 
 ## Ciclos
 ### While
-Al igual que con el if, la expresion del while ocupa ser bool.
+Al igual que con el if, la expresión del while ocupa ser bool.
 ```
 num = 0;
 while(num < 1) do{
-    write("Introduce un numero mayor a 0");
+    write("Introduce un número mayor a 0");
     read(num);
 }
 ```
@@ -167,7 +164,7 @@ MeMyself es capaz de tener un output grafico gracias a las funciones
 
 ## Size
 Antes de poder utilizar las otras funciones es necesario usar esta.<br/> 
-Size especifica el tamaño del canvas en pixeles (ancho,altura).
+Size especifica el tamaño del canvas en pixeles (ancho, altura).
 ```
 Size(720,480);
 ```
@@ -196,9 +193,9 @@ Penup se llama cuando se quiere desplegar la ventana del canvas. <br/>
 Penup();
 ```
 ## Line
-Line dibuja una linea en el canvas. <br/> 
+Line dibuja una línea en el canvas. <br/> 
 La linea se va a dibujar desde las coordenadas establecidas por **Pendown** hasta las coordenadas pasadas en los parametros. <br/>
-Los parametros son Line(x,y).
+Los parámetros son Line(x,y).
 ```
 Line(500, 200);
 ```
@@ -220,19 +217,10 @@ Se le puede especificar el color de relleno a Circle de manera opcional.
 Circle(4,"blue"); // "blue" es opcional
 ```
 
-## Circle
-Circle dibuja un circulo en el canvas. <br/> 
-El circulo se va a dibujar en las coordenadas establecidas por **Pendown**. <br/>
-Se ocupa especificar el tamaño del circulo este puede ser entre 0 y 10. <br/>
-Se le puede especificar el color de relleno a Circle de manera opcional.
-```
-Circle(4,"blue"); // "blue" es opcional
-```
-
 ## Arc
 Arc dibuja un arco en el canvas. <br/> 
 El circulo se va a dibujar en las coordenadas establecidas por **Pendown**. <br/>
-Arc toma 2 parametros y un color opcional </br>
+Arc toma 2 parámetros y un color opcional </br>
 El primer parametro es el tamaño del arco este puede ser entre 0 y 10.<br/>
 El segundo parametro es el angulo del arco este puede estar entre 0 y 360<br/>
 Se le puede especificar el color de relleno a Circle de manera opcional.
