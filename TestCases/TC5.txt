@@ -15,7 +15,7 @@ module int find(int x);
 main(){
     num = 0;
     from i=0 to 20 do{
-        Array[30] = i*2+1;
+        Array[i] = i*2+1;
     }
     write("Que numero quieres buscar?");
     read(num);

@@ -9,8 +9,7 @@ class Memoria(object):
 
     def get(self, dir):
         if dir not in self.memoria:
-            print(dir)
-            print("ERORR la variable pedida no tiene nada asignado")
+            print("ERORR la variable pedida en la direccion", dir,"no tiene nada asignado")
             sys.exit()
         return self.memoria[dir]
 
