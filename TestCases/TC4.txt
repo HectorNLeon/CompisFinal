@@ -1,5 +1,4 @@
 Program TC4;
-var int: num;
 
 module int fact (int j);
 {
@@ -12,8 +11,15 @@ module int fact (int j);
         }
 }
 
-main(){
+module int getNum();
+var int: num;
+{
     write("Ingresa el factorial a calcular");
     read(num);
-    write(fact(num));
+    return(num);
+}
+
+main(){
+    
+    write(fact(getNum()));
 }

@@ -141,7 +141,7 @@ def runContext():
             pilaMemoriaTemp.append(Memoria())
             index = 1
             for param in funciones[nombre]["params"]:
-                assignValor(llamadaFuncion[-1][1], param)
+                assignValor(llamadaFuncion[-1][index], param)
                 index += 1
             llamadaFuncion.pop()
         elif cuadruplo[0] == "return":
@@ -195,7 +195,7 @@ def runContext():
                 print("ERROR: Inicializa primero el canvas con la funcion size")
                 sys.exit()
             fillColor = None
-            if cuadruplo[2] != "-1":
+            if cuadruplo[3] != "-1":
                 fillColor = getValor(cuadruplo[3])
             size = getValor(cuadruplo[1])
             ext = getValor(cuadruplo[2])

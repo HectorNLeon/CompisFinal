@@ -857,7 +857,7 @@ def p_popPoint(p):
     if hasFillColor:
         color = pilaOp.pop()
         pilaTipo.pop()
-        hasFillColor = True
+        hasFillColor = False
     op = pilaOp.pop()
     tipo = pilaTipo.pop()
     if tipo !=  "int" and tipo != "float":
@@ -875,7 +875,7 @@ def p_popCircle(p):
     if hasFillColor:
         color = pilaOp.pop()
         pilaTipo.pop()
-        hasFillColor = True
+        hasFillColor = False
     op = pilaOp.pop()
     tipo = pilaTipo.pop()
     if tipo !=  "int" and tipo != "float":
@@ -893,7 +893,7 @@ def p_popArc(p):
     if hasFillColor:
         color = pilaOp.pop()
         pilaTipo.pop()
-        hasFillColor = True
+        hasFillColor = False
     op1 = pilaOp.pop()
     op2 = pilaOp.pop()
     tipo1 = pilaTipo.pop()

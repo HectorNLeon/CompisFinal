@@ -1,12 +1,16 @@
 Program TC3;
-var int : num;
+var int : num, i;
 
 
 module void dibujar(int x);
 {
+
     Size(720,480);
     Pendown(300,200);
-    Circle(x, "red");
+    from i=0 to 5 do{
+        Pendown(300+i*5, 200);
+        Circle(i+2);
+    }
     Penup();
 }
 
